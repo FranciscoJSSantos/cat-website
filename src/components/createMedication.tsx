@@ -1,3 +1,5 @@
+import { createCatRemedio } from "@/assets/data/remedios";
+import { queryClient } from "@/lib/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Dialog,
@@ -8,6 +10,7 @@ import {
   DialogTrigger,
 } from "@radix-ui/react-dialog";
 import { Label } from "@radix-ui/react-label";
+import { useMutation } from "@tanstack/react-query";
 import { register } from "module";
 import { useForm } from "react-hook-form";
 import { MdEdit } from "react-icons/md";
@@ -34,8 +37,41 @@ export function CreateMedicationDialog() {
     resolver: zodResolver(createMedicationSchema),
   });
 
-  function handleCreateMedication(data: CreateMedicationSchema) {
-    console.log(data);
+  const { mutateAsync: createCatRemedioFn } = useMutation({
+    mutationFn: createCatRemedio,
+    onSuccess(_, variables) {
+      const cached = queryClient.getQueryData(["catRemedios"]);
+
+      queryClient.setQueryData(["catRemedios"], (data: any | unknown) => {
+        return [
+          ...data,
+          {
+            id: crypto.randomUUID,
+            nomeRemedio: variables.nomeRemedio,
+            quantidade: variables.quantidade,
+            horario: variables.horario,
+            duracao: variables.duracao,
+            sobre: variables.sobre,
+          },
+        ];
+      });
+    },
+  });
+
+  async function handleCreateMedication(data: CreateMedicationSchema) {
+    try {
+      await createCatRemedioFn({
+        nomeRemedio: data.nomeRemedio,
+        quantidade: data.quantidade,
+        horario: data.horario,
+        duracao: data.duracao,
+        sobre: data.sobre,
+      });
+
+      alert(`Remédio cadastro com sucesso!`);
+    } catch (err) {
+      alert(`Erro no cadastro do remédio`);
+    }
   }
 
   return (
