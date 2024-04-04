@@ -35,3 +35,9 @@ export async function createCatRemedio(_: CreateCatRemedioRequest) {
 
   return;
 }
+
+export async function editCatRemedio(_: CreateCatRemedioRequest) {
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
+  return;
+}

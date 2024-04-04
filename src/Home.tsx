@@ -5,7 +5,7 @@ import Top from "./screens/top/App";
 function Home() {
   return (
     <>
-      <div className="bg-zinc-950 h-screen w-screen">
+      <div className="bg-zinc-950 ">
         <Top />
         <Center />
         <Bottom />

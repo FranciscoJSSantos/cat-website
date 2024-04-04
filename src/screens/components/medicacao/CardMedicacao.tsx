@@ -10,6 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 import { EditMedicationDialog } from "@/components/editMedication";
 import {
@@ -29,9 +30,9 @@ import { MdEdit } from "react-icons/md";
 import { PiQuestionFill } from "react-icons/pi";
 import { RiDeleteBin6Fill } from "react-icons/ri";
 
-import { Label } from "@radix-ui/react-label";
-import { useQuery } from "@tanstack/react-query";
-import { getProducts } from "../../../assets/data/remedios";
+
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { editCatRemedio, getProducts } from "../../../assets/data/remedios";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -41,6 +42,7 @@ import { z } from "zod";
 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { queryClient } from "@/lib/react-query";
 
 interface CardMedicacao {
   id: number;
@@ -51,7 +53,7 @@ interface CardMedicacao {
   sobre: string;
 }
 
-const createMedicationSchema = z.object({
+const editMedicationSchema = z.object({
   nomeRemedio: z.string(),
   quantidade: z.string(),
   horario: z.string(),
@@ -59,7 +61,7 @@ const createMedicationSchema = z.object({
   sobre: z.string(),
 });
 
-type CreateMedicationSchema = z.infer<typeof createMedicationSchema>;
+type CreateMedicationSchema = z.infer<typeof editMedicationSchema>;
 
 function CardMedicacao() {
   const localUrl = "http://localhost:3000";
@@ -95,10 +97,6 @@ function CardMedicacao() {
   //     });
   // }, []);
 
-  const { register, handleSubmit } = useForm<CreateMedicationSchema>({
-    resolver: zodResolver(createMedicationSchema),
-  });
-
   function handleCreateMedication(data: CreateMedicationSchema) {
     console.log(data);
   }
@@ -119,11 +117,52 @@ function CardMedicacao() {
     );
   }
 
-  function editCard() {
+  const { register, handleSubmit } = useForm<CreateMedicationSchema>({
+    resolver: zodResolver(editMedicationSchema),
+  });
+
+  const { mutateAsync: editCatRemedioFn } = useMutation({
+    mutationFn: editCatRemedio,
+    onSuccess(_, variables) {
+      const cached = queryClient.getQueryData(["catRemedios"]);
+
+      queryClient.setQueryData(["catRemedios"], (data: any | unknown) => {
+        return [
+          ...data,
+          {
+            id: crypto.randomUUID,
+            nomeRemedio: variables.nomeRemedio,
+            quantidade: variables.quantidade,
+            horario: variables.horario,
+            duracao: variables.duracao,
+            sobre: variables.sobre,
+          },
+        ];
+      });
+    },
+  });
+
+  async function handleEditMedication(data: CreateMedicationSchema) {
+    try {
+      await editCatRemedioFn({
+        nomeRemedio: data.nomeRemedio,
+        quantidade: data.quantidade,
+        horario: data.horario,
+        duracao: data.duracao,
+        sobre: data.sobre,
+      });
+
+     
+    } catch (err) {
+      alert(`Erro no cadastro do remédio`);
+    }
+  }
+
+  function editCard(data?: any) {
     return (
       <Dialog>
         <DialogTrigger className="ml-4 remove_mt">
-          <MdEdit className="text-2xl text-amber-500 cursor-pointer" />
+          <MdEdit  className="text-2xl text-amber-500 cursor-pointer" />
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -131,20 +170,21 @@ function CardMedicacao() {
             <DialogDescription>Preste atenção na edição 😊</DialogDescription>
           </DialogHeader>
           <form
-            onSubmit={handleSubmit(handleCreateMedication)}
-            className="space-y-6"
+            onSubmit={handleSubmit(handleEditMedication)}
+            className="grid gap-4 py-4"
           >
-            <div className="grid grid-cols-4 items-center text-right gap-3">
-              <Label htmlFor="nomeRemedio">Nome</Label>
+            <div className="grid md:grid-cols-4 items-center gap-4">
+              <Label className="text-right" htmlFor="nomeRemedio">Nome</Label>
               <Input
+                value={data.nomeRemedio}
                 id="nomeRemedio"
                 {...register("nomeRemedio")}
                 className="col-span-3"
                 placeholder="Tobramicina"
               />
             </div>
-            <div className="grid grid-cols-4 items-center text-right gap-3">
-              <Label htmlFor="quantidade" className="text-right">
+            <div className="grid md:grid-cols-4 items-center gap-4">
+              <Label className="text-right" htmlFor="quantidade">
                 Quantidade
               </Label>
               <Input
@@ -154,8 +194,8 @@ function CardMedicacao() {
                 placeholder="1 unid"
               />
             </div>
-            <div className="grid grid-cols-4 items-center text-right gap-3">
-              <Label htmlFor="horario">A cada</Label>
+            <div className="grid md:grid-cols-4 items-center gap-4">
+              <Label className="text-right" htmlFor="horario">A cada</Label>
               <Input
                 {...register("horario")}
                 id="horario"
@@ -163,8 +203,8 @@ function CardMedicacao() {
                 placeholder="12h"
               />
             </div>
-            <div className="grid grid-cols-4 items-center text-right gap-3">
-              <Label htmlFor="duracao">Tomar por</Label>
+            <div className="grid md:grid-cols-4 items-center gap-4">
+              <Label className="text-right" htmlFor="duracao">Tomar por</Label>
               <Input
                 {...register("duracao")}
                 id="duracao"
@@ -172,8 +212,8 @@ function CardMedicacao() {
                 placeholder="3 dias"
               />
             </div>
-            <div className="grid grid-cols-4 items-center text-right gap-3">
-              <Label htmlFor="sobre">Descrição</Label>
+            <div className="grid md:grid-cols-4 items-center gap-4">
+              <Label className="text-right" htmlFor="sobre">Descrição</Label>
               <Textarea
                 {...register("sobre")}
                 id="sobre"
@@ -181,10 +221,9 @@ function CardMedicacao() {
                 placeholder="Qual a finalidade do remédio.."
               />
             </div>
-
-            <DialogFooter>
+            <DialogFooter className="mt-2">
               <DialogClose asChild>
-                <Button type="button" variant="outline">
+                <Button className="mt-2" type="button" variant="outline">
                   Cancelar
                 </Button>
               </DialogClose>
@@ -205,7 +244,7 @@ function CardMedicacao() {
           <AlertDialogTrigger className="ml-4 remove_mt">
             <RiDeleteBin6Fill className="text-2xl text-red-600 cursor-pointer" />
           </AlertDialogTrigger>
-          <AlertDialogContent>
+          <AlertDialogContent className="sm:w-64 md:w-full sm:max-w-auto">
             <AlertDialogHeader>
               <AlertDialogTitle>
                 Tem certeza que deseja excluir ?
@@ -242,7 +281,7 @@ function CardMedicacao() {
               </div>
               <div className="flex flex-row">
                 {data.sobre && data.sobre !== "" ? dialogSobre(data) : ""}
-                {editCard()}
+                {editCard(data.id)}
                 {removeCard()}
               </div>
             </CardHeader>

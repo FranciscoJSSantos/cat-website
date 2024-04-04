@@ -30,7 +30,7 @@ import { queryClient } from "@/lib/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 //falta o id para criacao no banco
-const createMedicationSchema = z.object({
+const editMedicationSchema = z.object({
   nomeRemedio: z.string(),
   quantidade: z.string(),
   horario: z.string(),
@@ -38,7 +38,7 @@ const createMedicationSchema = z.object({
   sobre: z.string(),
 });
 
-type CreateMedicationSchema = z.infer<typeof createMedicationSchema>;
+type EditMedicationSchema = z.infer<typeof editMedicationSchema>;
 
 function Medicacoes() {
   const localUrl = "http://localhost:3000";
@@ -149,8 +149,8 @@ function Medicacoes() {
   //     </Dialog>
   //   );
   // }
-  const { register, handleSubmit } = useForm<CreateMedicationSchema>({
-    resolver: zodResolver(createMedicationSchema),
+  const { register, handleSubmit } = useForm<EditMedicationSchema>({
+    resolver: zodResolver(editMedicationSchema),
   });
 
   const { mutateAsync: createCatRemedioFn } = useMutation({
@@ -174,7 +174,7 @@ function Medicacoes() {
     },
   });
 
-  async function handleCreateMedication(data: CreateMedicationSchema) {
+  async function handleCreateMedication(data: EditMedicationSchema) {
     try {
       await createCatRemedioFn({
         nomeRemedio: data.nomeRemedio,
@@ -184,7 +184,7 @@ function Medicacoes() {
         sobre: data.sobre,
       });
 
-      alert(`Remédio cadastro com sucesso!`);
+    
     } catch (err) {
       alert(`Erro no cadastro do remédio`);
     }
@@ -198,17 +198,17 @@ function Medicacoes() {
             Adicionar Medicação <TiPlus className="ml-2" />
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="max-w-auto sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Editar Medicação</DialogTitle>
             <DialogDescription>Preste atenção na edição 😊</DialogDescription>
           </DialogHeader>
           <form
             onSubmit={handleSubmit(handleCreateMedication)}
-            className="space-y-6"
+            className="grid gap-4 py-4"
           >
-            <div className="grid grid-cols-4 items-center text-right gap-3">
-              <Label htmlFor="nomeRemedio">Nome</Label>
+            <div className="grid md:grid-cols-4 items-center gap-4">
+              <Label className="text-right" htmlFor="nomeRemedio">Nome</Label>
               <Input
                 id="nomeRemedio"
                 {...register("nomeRemedio")}
@@ -216,8 +216,8 @@ function Medicacoes() {
                 placeholder="Tobramicina"
               />
             </div>
-            <div className="grid grid-cols-4 items-center text-right gap-3">
-              <Label htmlFor="quantidade" className="text-right">
+            <div className="grid md:grid-cols-4 items-center gap-4">
+              <Label className="text-right" htmlFor="quantidade">
                 Quantidade
               </Label>
               <Input
@@ -227,8 +227,8 @@ function Medicacoes() {
                 placeholder="1 unid"
               />
             </div>
-            <div className="grid grid-cols-4 items-center text-right gap-3">
-              <Label htmlFor="horario">A cada</Label>
+            <div className="grid md:grid-cols-4 items-center gap-4">
+              <Label className="text-right" htmlFor="horario">A cada</Label>
               <Input
                 {...register("horario")}
                 id="horario"
@@ -236,8 +236,8 @@ function Medicacoes() {
                 placeholder="12h"
               />
             </div>
-            <div className="grid grid-cols-4 items-center text-right gap-3">
-              <Label htmlFor="duracao">Tomar por</Label>
+            <div className="grid md:grid-cols-4 items-center gap-4">
+              <Label className="text-right" htmlFor="duracao">Tomar por</Label>
               <Input
                 {...register("duracao")}
                 id="duracao"
@@ -245,7 +245,7 @@ function Medicacoes() {
                 placeholder="3 dias"
               />
             </div>
-            <div className="grid grid-cols-4 items-center text-right gap-3">
+            <div className="grid md:grid-cols-4 items-center gap-4">
               <Label htmlFor="sobre">Descrição</Label>
               <Textarea
                 {...register("sobre")}
@@ -254,9 +254,8 @@ function Medicacoes() {
                 placeholder="Qual a finalidade do remédio.."
               />
             </div>
-
-            <DialogFooter>
-              <DialogClose asChild>
+            <DialogFooter className="mt-2">
+              <DialogClose className="mt-2" asChild>
                 <Button type="button" variant="outline">
                   Cancelar
                 </Button>

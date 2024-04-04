@@ -5,7 +5,7 @@ import SocialMidias from "./socialMidias/App";
 function Center() {
   return (
     <>
-      <div className="flex align-middle justify-around">
+      <div className="grid sm:flex align-middle justify-around">
         <ColumnButtons />
         <LogoMiddlePage />
         <SocialMidias />

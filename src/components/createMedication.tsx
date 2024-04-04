@@ -2,12 +2,10 @@ import { createCatRemedio } from "@/assets/data/remedios";
 import { queryClient } from "@/lib/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  Dialog,
   DialogClose,
   DialogContent,
   DialogDescription,
-  DialogTitle,
-  DialogTrigger,
+  DialogTitle
 } from "@radix-ui/react-dialog";
 import { Label } from "@radix-ui/react-label";
 import { useMutation } from "@tanstack/react-query";
