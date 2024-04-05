@@ -13,7 +13,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel"
+} from "@/components/ui/carousel";
 
 import {
   Dialog,
@@ -39,24 +39,24 @@ function Bottom() {
     { id: 5, name: "Aurora" },
     { id: 6, name: "Luna" },
     { id: 7, name: "Pietra" },
-    { id: 8, name: 'Kevin'}
+    { id: 8, name: "Kevin" },
   ];
 
   function carouselSize() {
     return (
       <Carousel
         opts={{
-          align: "start"
+          align: "start",
         }}
-        className="w-full max-w-sm"
+        className="w-full max-w-sm flex items-center"
       >
         <CarouselContent className="-ml-1">
           {catsName.map((cat) => (
             <CarouselItem key={cat.id} className="md:basis-1/2 lg:basis-1/3">
-              <div className="p-1">
+              <div className="p-1 w-32 lg:space-x-12">
                 <Card>
                   <CardContent className="flex aspect-square items-center justify-center p-6">
-                    <span className="text-3xl font-semibold">{cat.name}</span>
+                    <span className="text-2xl font-semibold">{cat.name}</span>
                   </CardContent>
                 </Card>
               </div>
@@ -66,14 +66,14 @@ function Bottom() {
         <CarouselPrevious />
         <CarouselNext />
       </Carousel>
-    )
+    );
   }
 
   return (
     <>
-    <div className="w-full flex justify-center mt-16">
-    {carouselSize()}
-    </div>
+      <div className="w-full h-80 flex justify-center relative bottom-0 left-0">
+        {carouselSize()}
+      </div>
       {/* <div className="w-full flex justify-center mt-16">
         {catsName.map((cat) => {
           return (
